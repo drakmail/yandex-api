@@ -15,11 +15,19 @@ module Yandex::API
       direct_attributes :Param1, :Param2
     end
     #
+    # = CoverageInfo
+    #
+    class CoverageInfo < Base
+      direct_attributes :Probability, :Price
+    end
+    #
     # = Phrases
     #
     class BannerPhraseInfo < Base
-      direct_attributes :PhraseID, :Phrase, :IsRubric, :Price, :AutoBudgetPriority, :ContextPrice, :AutoBroker
-      direct_objects [:UserParams, PhraseUserParams]
+      direct_attributes :BannerID, :CampaignID, :AdGroupID, :PhraseID, :Phrase, :IsRubric, :Price, :ContextPrice, :AutoBroker, :StatusPhraseModerate, :AutoBudgetPriority,
+                        :Clicks, :Shows, :ContextClicks, :ContextShows, :Min, :Max, :PremiumMin, :PremiumMax, :LowCTRWarning, :LowCTR, :ContextLowCTR,
+                        :Prices, :CurrentOnSearch, :MinPrice, :StatusPaused, :Currency
+      direct_objects [:UserParams, PhraseUserParams], [:Coverage, CoverageInfo], [:ContextCoverage, CoverageInfo]
     end
     
     #
@@ -35,22 +43,31 @@ module Yandex::API
     class MapPoint < Base
       direct_attributes :x, :y, :x1, :y1, :x2, :y2
     end
-    
+
     #
     # = ContactInfo
     #
     class ContactInfo < Base
-      direct_attributes :CompanyName, :ContactPerson, :Country, :CountryCode, :City, :Street, :House, :Build,
-        :Apart, :CityCode, :Phone, :PhoneExt, :IMClient, :IMLogin, :ExtraMessage, :ContactEmail, :WorkTime, :OGRN
+      direct_attributes :ContactPerson, :Country, :CountryCode, :City, :Street, :House, :Build, :Apart, :CityCode, :Phone,
+                        :PhoneExt, :CompanyName, :IMClient, :IMLogin, :ExtraMessage, :ContactEmail, :WorkTime, :OGRN
       direct_objects [:PointOnMap, MapPoint]
+    end
+
+    #
+    # = RejectReason
+    #
+    class RejectReason < Base
+      direct_attributes :Type, :Text
     end
     
     #
     # = Banner
     #
     class BannerInfo < Base
-      direct_attributes :BannerID, :CampaignID, :Title, :Text, :Href, :Geo, :MinusKeywords
-      direct_arrays [:Phrases, BannerPhraseInfo], [:Sitelinks, Sitelink]
+      direct_attributes :BannerID, :CampaignID, :AdGroupID, :AdGroupName, :Title, :Text, :Href, :Domain, :Geo,
+                        :StatusActivating, :StatusArchive, :StatusBannerModerate, :StatusPhrasesModerate, :StatusPhoneModerate, :StatusAdImageModerate,
+                        :StatusShow, :IsActive, :StatusSitelinksModerate, :AdWarnings, :FixedOnModeration, :MinusKeywords, :AgeLabel, :AdImageHash
+      direct_arrays [:Phrases, BannerPhraseInfo], [:Sitelinks, Sitelink], [:ModerateRejectionReasons, RejectReason]
       direct_objects [:ContactInfo, ContactInfo]
       def self.find id
         result = Direct::request("GetBanners", {:BannerIDS => [id]})

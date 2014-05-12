@@ -32,7 +32,7 @@ module Yandex::API::Direct
       # build hash of attributes
       self.class.attributes.each do |attribute|
         value = send(attribute)
-        next unless value.present?
+        next if value.nil?
         result[attribute] = value
       end
       # build hash of arrays
@@ -46,7 +46,7 @@ module Yandex::API::Direct
       end
       # build hash of objects
       self.class.objects.each do |object,type|
-        value_hash = send(object).try(:to_hash) || {}
+        value_hash = send(object).to_hash || {}
         next if value_hash.empty?
         result[object] = value_hash
       end
@@ -59,6 +59,7 @@ module Yandex::API::Direct
         if object
           send("#{key}=", object.last.new(value))
         elsif array
+          next if value.nil?
           send("#{key}=", value.collect {|element| array.last.new(element)})
         else
           send("#{key}=", value) if respond_to? "#{key}="

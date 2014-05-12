@@ -11,7 +11,14 @@ module Yandex::API
     # = CampaignStrategy
     #
     class CampaignStrategy < Base
-      direct_attributes :StrategyName, :MaxPrice, :AveragePrice, :WeeklySumLimit, :ClicksPerWeek
+      direct_attributes :StrategyName, :MaxPrice, :AveragePrice, :AverageCPA, :WeeklySumLimit, :ClicksPerWeek, :GoalID
+    end
+
+    #
+    # = CampaignContextStrategy
+    #
+    class CampaignContextStrategy < Base
+      direct_attributes :StrategyName, :ContextLimit, :ContextLimitSum, :ContextPricePercent, :MaxPrice, :AveragePrice, :AverageCPA, :WeeklySumLimit, :ClicksPerWeek, :GoalID
     end
     
     #
@@ -29,30 +36,41 @@ module Yandex::API
     end
     
     #
-    # = TimeTargetInfo
-    #
-    class TimeTarget < Base
-      direct_attributes :ShowOnHolidays, :HolidayShowFrom, :HolidayShowTo, :DaysHours, :TimeZone  
-    end
-
-    #
     # = TimeTargetItem
     #
     class TimeTargetItem < Base
-      direct_attributes :Days, :Hours  
+      direct_attributes :Days, :Hours, :BidCoefs
     end
+
+    #
+    # = TimeTargetInfo
+    #
+    class TimeTarget < Base
+      direct_attributes :ShowOnHolidays, :HolidayShowFrom, :HolidayShowTo, :TimeZone, :WorkingHolidays
+      direct_arrays [:DaysHours, TimeTargetItem]
+    end
+
+    #
+    # = DayBudgetInfo
+    #
+    class DayBudgetInfo < Base
+      direct_attributes :Amount, :SpendMode
+    end
+
     #
     # = CampaignInfo
     #
     class CampaignInfo < Base
-      direct_attributes :Login, :CampaignID, :Name, :FIO, :StartDate, :StatusBehavior, :StatusContextStop, :ContextLimit, :ContextLimitSum, :ContextPricePercent,
-              :AutoOptimization, :StatusMetricaControl, :DisabledDomains, :DisabledIps, :StatusOpenStat, :ConsiderTimeTarget, :MinusKeywords, :AddRelevantPhrases,
-              :RelevantPhrasesBudgetLimit
-      direct_objects [:Strategy, CampaignStrategy], [:SmsNotification, SmsNotification], [:EmailNotification, EmailNotification], [:TimeTarget, TimeTarget]
+      direct_attributes :Login, :CampaignID, :Name, :FIO, :StartDate, :Sum, :Rest, :BonusDiscount, :Shows, :Clicks, :Currency, :CampaignCurrency, :SourceCampaignID,
+              :ClickTrackingEnabled, :AdditionalMetrikaCounters, :Status,
+              :StatusBehavior, :StatusContextStop, :ContextLimit, :ContextLimitSum, :ContextPricePercent,
+              :AutoOptimization, :StatusMetricaControl, :DisabledDomains, :DisabledIps, :StatusOpenStat, :ConsiderTimeTarget, :ManagerName, :AgencyName, :StatusShow, :StatusArchive, :StatusActivating, :StatusModerate, :IsActive, :MinusKeywords, :AddRelevantPhrases,
+              :RelevantPhrasesBudgetLimit, :SumAvailableForTransfer, :DayBudgetEnabled
+      direct_objects [:Strategy, CampaignStrategy], [:ContextStrategy, CampaignContextStrategy], [:SmsNotification, SmsNotification], [:EmailNotification, EmailNotification], [:TimeTarget, TimeTarget], [:DayBudget, DayBudgetInfo]
       
       def banners
         banners = []
-        Direct::request("GetBanners", {:CampaignIDS => [self.CampaignID]}).each do |banner|
+        Direct::request("GetBanners", {:CampaignIDS => [self.CampaignID], :Currency => self.Currency}).each do |banner|
           banners << BannerInfo.new(banner)
         end
         banners
@@ -75,8 +93,8 @@ module Yandex::API
       def delete
         Direct::request("DeleteCampaign", {:CampaignID => self.CampaignID})
       end
-      def self.find id
-        result = Direct::request("GetCampaignParams", {:CampaignID => id})
+      def self.find id, currency = "RUB"
+        result = Direct::request("GetCampaignParams", {:CampaignID => id, :Currency=> currency})
         raise Yandex::NotFound.new("not found campaign where CampaignID = #{id}") if result.empty?
         new(result)
       end
