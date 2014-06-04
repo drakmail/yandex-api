@@ -46,6 +46,7 @@ module Yandex::API::Direct
       end
       # build hash of objects
       self.class.objects.each do |object,type|
+        next if send(object).nil?
         value_hash = send(object).to_hash || {}
         next if value_hash.empty?
         result[object] = value_hash

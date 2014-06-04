@@ -75,26 +75,26 @@ module Yandex::API
         banner = new(result.first)
       end
       def save
-        Direct::request("CreateOrUpdateBanners", [self.to_hash]).first
+        self.BannerID = Direct::request("CreateOrUpdateBanners", [self.to_hash]).first
       end
 
       def archive
-        Direct::request("ArchiveBanners", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("ArchiveBanners", {:BannerIDS => [self.BannerID]})
       end
       def unarchive
-        Direct::request("UnArchiveCampaign", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("UnArchiveCampaign", {:BannerIDS => [self.BannerID]})
       end
       def moderate
-        Direct::request("ModerateBanners", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("ModerateBanners", {:BannerIDS => [self.BannerID]})
       end
       def resume
-        Direct::request("ResumeBanners", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("ResumeBanners", {:BannerIDS => [self.BannerID]})
       end
       def stop
-        Direct::request("StopBanners", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("StopBanners", {:BannerIDS => [self.BannerID]})
       end
       def delete
-        Direct::request("DeleteBanners", {:CampaignID => self.CampaignID, :BannerIDS => [self.BannerID]})
+        Direct::request("DeleteBanners", {:BannerIDS => [self.BannerID]})
       end
     end
   end
