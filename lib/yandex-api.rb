@@ -5,6 +5,8 @@ require "yandex-api/direct/banner_info"
 require "yandex-api/direct/campaign_info"
 require "yandex-api/direct/finance"
 require "yandex-api/direct/price"
+require "yandex-api/direct/misc"
+require "yandex-api/direct/report"
 
 module Yandex
   module API
