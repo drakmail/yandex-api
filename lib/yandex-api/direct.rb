@@ -26,6 +26,11 @@ module Yandex
         end
       end
 
+      def self.load_from_hash settings, env = nil
+        @enviroment = env if env
+        @configuration = defined?(@enviroment) ? settings[@enviroment] : settings
+      end
+
       def self.load file, env = nil
         @enviroment = env if env
         config = YAML.load_file(file)
